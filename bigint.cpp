@@ -270,9 +270,9 @@ public:
     {
         BigInt zero(0);
         BigInt one(1);
-        
+
         BigInt nCopy = n;
-    
+
         if (nCopy.operator==(zero))
             return a;
         if (nCopy.operator==(one))
