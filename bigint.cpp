@@ -34,7 +34,8 @@ public:
 
         while (number > 0)
         {
-            v.push_back(number % 10); // stores it in reverse, making operation easier
+            char digit = number % 10;
+            v.push_back(digit);
             number /= 10;
         }
     }
@@ -190,7 +191,7 @@ public:
     {
         if (v.size() > b.v.size()) // if v is larger in size then it is larger than b
             return false;
-        
+
         if (v.size() < b.v.size()) // if v is smaller in size then it is smaller than b
             return true;
 
@@ -241,8 +242,7 @@ public:
         }
     }
 
-    // do tail recursion
-    static BigInt fibo(BigInt n, BigInt a = BigInt(0), BigInt b = BigInt(1))
+    static BigInt fiboHelper(BigInt n, BigInt a = BigInt(0), BigInt b = BigInt(1))
     {
         BigInt zero(0);
         BigInt one(1);
@@ -251,27 +251,26 @@ public:
             return a;
         if (n.operator==(one))
             return b;
-        return fibo(n.operator-(one), b, a + b);
+        return fiboHelper(n.operator-(one), b, a + b);
     }
 
-    BigInt fibo() // need instance version for unit test call to fibo.fibo()
+    BigInt fibo()
     {
-        return BigInt::fibo(*this);
+        return BigInt::fiboHelper(*this);
     }
 
-    static BigInt fact(BigInt n)
+    static BigInt factHelper(BigInt n, BigInt res = BigInt(1))
     {
         BigInt one(1);
 
         if (n.operator<=(one))
-            return one;
-        return n * fact(n.operator-(one));
+            return res;
+        return factHelper(n.operator-(one), n * res);
     }
 
-    // need instance version for unit test call to fact.fact()
     BigInt fact()
     {
-        return BigInt::fact(*this);
+        return BigInt::factHelper(*this, BigInt(1));
     }
 
     friend BigInt operator+(int a, const BigInt &b)
@@ -279,16 +278,16 @@ public:
         return BigInt(a) + b; // convert a to BigInt and add it to b (big int)
     }
 
-    friend ostream &operator<<(ostream &out, const BigInt &b)
+    friend ostream &operator<<(ostream &out, BigInt b)
     {
         if (b.v.size() > 12)
         {
-            int exponent = b.v.size() - 1;
-            out << (int)(b.v[b.v.size() - 1]) << "."; // first digit.
+            int exponent = b.v.size() - 1;            // e[blank]
+            out << (int)(b.v[b.v.size() - 1]) << "."; // first digit but since stored reverse, its last digit
 
             for (int i = 0; i < 6 && b.v.size() - 2 - i >= 0; i++)
             {
-                out << (int)(b.v[b.v.size() - 2 - i]);
+                out << (int)(b.v[b.v.size() - 2 - i]); // next 6 digits
             }
 
             out << "e" << exponent;
