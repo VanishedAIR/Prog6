@@ -39,15 +39,12 @@ public:
         }
     }
 
-    BigInt(const string &str)
+    BigInt(string str)
     {
         int i = str.length() - 1;
         while (i >= 0)
         {
-            if (isdigit(str[i]))
-            {
-                v.push_back(str[i] - '0'); // convert using ascii value starting at 0 which is 48
-            }
+            v.push_back(str[i] - '0'); // convert using ascii value starting at 0 which is 48
             i--;
         }
 
@@ -57,7 +54,7 @@ public:
         }
     }
 
-    BigInt operator+(const BigInt &b)
+    BigInt operator+(BigInt b)
     {
         BigInt result; //<- result is a BigInt
         result.v.clear();
@@ -81,11 +78,8 @@ public:
         return result;
     }
 
-    BigInt operator-(const BigInt &b)
+    BigInt operator-(BigInt b)
     {
-        if (this->operator<(b))
-            return BigInt(0);
-
         BigInt result;
         result.v.clear();
 
@@ -112,7 +106,6 @@ public:
             i++;
         }
 
-        // remove zeros
         while (result.v.size() > 1 && result.v[result.v.size() - 1] == 0)
         {
             result.v.pop_back();
@@ -121,40 +114,37 @@ public:
         return result;
     }
 
-    BigInt operator*(const BigInt &b)
+    BigInt operator*(BigInt b)
     {
         BigInt zero(0);
         BigInt one(1);
 
-        BigInt bCopy = b;
-
-        if (this->operator==(zero) || bCopy.operator==(zero))
+        if (this->operator==(zero) || b.operator==(zero))
             return BigInt(0);
         if (this->operator==(one))
-            return bCopy;
-        if (bCopy.operator==(one))
+            return b;
+        if (b.operator==(one))
             return *this;
 
-        if (b.v.size() > v.size()) // choose the smaller num
+        if (b.v.size() > v.size())
         {
-            BigInt bCopy2 = b;
-            return bCopy2.operator*(*this);
+            return b.operator*(*this);
         }
 
-        BigInt result(0);
-        BigInt counter(0);
+        BigInt res(0);
+        BigInt count(0);
         BigInt temp = *this;
 
-        while (counter.operator<(bCopy))
+        while (count.operator<(b))
         {
-            result = result + temp;
-            counter = counter + one;
+            res = res + temp;
+            count = count + one;
         }
 
-        return result;
+        return res;
     }
 
-    BigInt operator/(const BigInt &b)
+    BigInt operator/(BigInt b)
     {
         // div is repeated subtraction
         BigInt result(0);
@@ -170,7 +160,7 @@ public:
         return result;
     }
 
-    BigInt operator%(const BigInt &b)
+    BigInt operator%(BigInt b)
     {
         BigInt temp = *this;
 
@@ -182,7 +172,7 @@ public:
         return temp; // returns the remainder
     }
 
-    bool operator==(const BigInt &b)
+    bool operator==(BigInt b)
     {
         if (v.size() != b.v.size()) // if the sizes are different then they are not equal
             return false;
@@ -196,12 +186,13 @@ public:
         return true;
     }
 
-    bool operator<(const BigInt &b)
+    bool operator<(BigInt b)
     {
-        if (v.size() < b.v.size()) // if v is smaller in size then it is smaller than b
-            return true;
         if (v.size() > b.v.size()) // if v is larger in size then it is larger than b
             return false;
+        
+        if (v.size() < b.v.size()) // if v is smaller in size then it is smaller than b
+            return true;
 
         for (int i = v.size() - 1; i >= 0; i--)
         {
@@ -214,23 +205,22 @@ public:
         return false; // also return false if they are equal
     }
 
-    bool operator>(const BigInt &b)
+    bool operator>(BigInt b)
     {
-        BigInt bCopy = b;
-        return bCopy.operator<(*this); // if b is smaller than v then v is larger than b
+        return b.operator<(*this); // if b is smaller than v then v is larger than b
     }
 
     bool operator<=(const BigInt &b)
     {
-        return this->operator<(b) || this->operator==(b); // if v is smaller than b or they are equal then v is smaller than b or they are equal
+        return this->operator==(b) || this->operator<(b); // if v is smaller than b or they are equal then v is smaller than b or they are equal
     }
 
-    bool operator>=(const BigInt &b)
+    bool operator>=(BigInt b)
     {
         return this->operator>(b) || this->operator==(b);
     }
 
-    BigInt &operator++() // pre increment
+    BigInt operator++() // pre increment
     {
         *this = *this + BigInt(1);
         return *this;
@@ -243,20 +233,6 @@ public:
         return temp; // return the original value before incrementing
     }
 
-    char operator[](int index) // index function
-    {
-        if (index >= 0 && index < (int)(v.size()))
-        {
-            return v[index];
-        }
-        return 0; // out of bounds
-    }
-
-    int size()
-    {
-        return v.size();
-    }
-
     void print()
     {
         for (int i = v.size() - 1; i >= 0; i--) // prints in reverse since we stored in reverse
@@ -266,19 +242,16 @@ public:
     }
 
     // do tail recursion
-    static BigInt fibo(const BigInt &n, BigInt a = BigInt(0), BigInt b = BigInt(1))
+    static BigInt fibo(BigInt n, BigInt a = BigInt(0), BigInt b = BigInt(1))
     {
         BigInt zero(0);
         BigInt one(1);
 
-        BigInt nCopy = n;
-
-        if (nCopy.operator==(zero))
+        if (n.operator==(zero))
             return a;
-        if (nCopy.operator==(one))
+        if (n.operator==(one))
             return b;
-        BigInt nMinusOne = nCopy.operator-(one);
-        return fibo(nMinusOne, b, a + b);
+        return fibo(n.operator-(one), b, a + b);
     }
 
     BigInt fibo() // need instance version for unit test call to fibo.fibo()
@@ -286,15 +259,13 @@ public:
         return BigInt::fibo(*this);
     }
 
-    static BigInt fact(const BigInt &n)
+    static BigInt fact(BigInt n)
     {
         BigInt one(1);
-        BigInt nCopy = n;
 
-        if (nCopy.operator<=(one))
+        if (n.operator<=(one))
             return one;
-        BigInt nMinusOne = nCopy.operator-(one);
-        return nCopy * fact(nMinusOne);
+        return n * fact(n.operator-(one));
     }
 
     // need instance version for unit test call to fact.fact()
